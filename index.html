@@ -8,13 +8,20 @@
 <body>
 
   <div id="example" class="cf">
-    <canvas id="grid"></canvas>
+    
+    <div id="visuals">
+      <canvas id="grid"></canvas>
+      <div id="vt-command-steps"></div>
+    </div>
+    
+    <button id="vt-next" class="button fill-green rcon next">Next step</button>
+
     <div id="vt-info">
       <h4 id="vt-title">Step 0</h4>
       <p id="vt-command">An empty vector tile</p>
-      <p id="vt-description">The vector tile to the left is a 10x10 grid with 2 cell buffer. Let's encode some geometry to the grid. Let's start with the <span style="color: blue">blue polygon</span>.</p>
+      <p id="vt-description">The vector tile to the left is a 10x10 grid with 2 cell buffer. Let's encode some geometry to the grid. Let's start with the <span class="poly blue">blue polygon</span>.</p>
     </div>
-    <button id="vt-next">Next step</button>
+
   </div>
 
   <script src="vt.js"></script>

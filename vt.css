@@ -2,10 +2,12 @@ body {
   margin: 3em auto;
   max-width: 55em;
 }
-canvas {
+#visuals {
   float: left;
   margin-right: 1em;
 }
+canvas {}
+
 #example {
   height: 300px;
 }
@@ -25,20 +27,32 @@ canvas {
   font-size: 1.3em;
   margin: 0 0 1em;
 }
-#vt-next {
-  background: transparent;
-  border: 3px solid #b44682;
-  border-radius: 3px;
-  color: #b44682;
+#vt-description span  {
   font-family: 'Source Code Pro', Menlo, Consolas, Monaco, monospace;
-  font-size: 1em;
-  padding: 0.4em;
-  margin-top: 2em;
 }
-#vt-next:hover {
-  cursor: pointer;
-  background: #f6f6f6;
+.poly {
+  color: white;
+  padding: .03em 0.3em;
+  font-size: 0.8em;
+  display: inline-block;
+  border-radius: 0.3em;
+  font-weight: 900;
 }
-#vt-next:focus {
-  outline: none;
+.blue { 
+  background-color: #0074D9;
+}
+.red { 
+  background-color: #FF4136;
+}
+#vt-next {
+  float: right;
+}
+#vt-next:hover {}
+#vt-next:focus {}
+#vt-command-steps {
+  display: block;
+}
+.command-step {
+  font-family: 'Source Code Pro', Menlo, Consolas, Monaco, monospace;
+  display: block;
 }
