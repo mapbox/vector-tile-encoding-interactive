@@ -50,23 +50,31 @@ function drawGrid(c, size, buff) {
 }
 
 function next(index) {
+  ctx.clearRect(0, 0, grid.width, grid.height);
+  makeGrid(grid, tilesize, buffer);
+  
   var s = steps[index];
   try {
     title.innerHTML = s.name;
     desc.innerHTML = s.description;
     command.innerHTML = s.commandx;
     btn.innerHTML = s.buttonText;
-    s.command();
+
+    // draw all steps since
+    for (var c = 0; c <= stepCount; c++) {
+      steps[c].command();
+    }
+    // then draw the single pen
+    s.pen();
+    
     addStep(s.commandx, s.color);
     stepCount++;
   } catch (err) {
     title.innerHTML = 'Step 0';
-    desc.innerHTML = 'The vector tile to the left is a 10x10 grid with 2 cell buffer. Let\'s encode some geometry to the grid, starting with a <span class="poly blue">blue polygon</span>.';
-    command.innerHTML = 'An empty vecotor tile';
+    desc.innerHTML = 'The vector tile to the left is a 10x10 grid with 2 cell buffer. Let\'s encode some geometry to the grid starting with a <span class="poly blue">blue polygon</span>. The following commands will be relative to the <span class="poly black">pen</span> (black dot).';
+    command.innerHTML = 'An empty vector tile';
     btn.innerHTML = 'Next step';
     commandSteps.innerHTML = '';
-    ctx.clearRect(0, 0, grid.width, grid.height);
-    makeGrid(grid, tilesize, buffer);
     stepCount=0;
   }
 }
@@ -86,23 +94,33 @@ var cmd = {
   "lt": function(x, y) {
     ctx.lineTo(buffx + (cellSize*x), buffx + (cellSize*y));
   },
-  "arc": function(x, y) {
+  "pen": function(x, y) {
+    ctx.fillStyle = '#333333';
+    ctx.beginPath();
     ctx.arc(buffx + (cellSize*x), buffx + (cellSize*y), 3, 0, 2*Math.PI);
+    ctx.fill();
   }
 };
+
+function ctxClear() {
+  ctx.clearRect(0, 0, grid.width, grid.height);
+}
+
+// restore
+// draw
+// save
+// pen
 
 var steps = [
   {
     "name": "Step 1",
     "color": "#0074D9",
-    "description": "The first action when encoding a polygon is to point the command to a starting point. This uses the <code>MoveTo(x,y)</code> command. The <span class='poly blue'>blue</span> dot is at <code>2, 2</code> starting at the top left of the grid.",
+    "description": "The first action when encoding a polygon is to point the command to a starting point. This uses the <code>MoveTo(x,y)</code> command. The <span class='poly black'>pen</span> is at <code>2, 2</code> starting at the top left of the grid.",
     "commandx": "MoveTo(1,2)",
     "buttonText": "Next step",
-    "command": function() {
-      ctx.fillStyle = '#0074D9';
-      ctx.beginPath();
-      cmd.arc(1,2);
-      ctx.fill();
+    "command": function() {},
+    "pen": function() {
+      cmd.pen(1,2);
     }
   },
   {
@@ -112,11 +130,14 @@ var steps = [
     "commandx": "LineTo(3,-1)",
     "buttonText": "Next step",
     "command": function() {
-      ctx.strokeStyle = '#0074D9';
+      ctx.strokeStyle = this.color;
       ctx.beginPath();
       cmd.mt(1,2);
       cmd.lt(4,1);
       ctx.stroke();
+    },
+    "pen": function() {
+      cmd.pen(4,1);
     }
   },
   {
@@ -126,11 +147,14 @@ var steps = [
     "commandx": "LineTo(3,4)",
     "buttonText": "Next step",
     "command": function() {
-      ctx.strokeStyle = '#0074D9';
+      ctx.strokeStyle = this.color;
       ctx.beginPath();
       cmd.mt(4,1);
       cmd.lt(7,5);
       ctx.stroke();
+    },
+    "pen": function() {
+      cmd.pen(7,5);
     }
   },
   {
@@ -140,25 +164,31 @@ var steps = [
     "commandx": "LineTo(-4,2)",
     "buttonText": "Next step",
     "command": function() {
-      ctx.strokeStyle = '#0074D9';
+      ctx.strokeStyle = this.color;
       ctx.beginPath();
       cmd.mt(7,5);
       cmd.lt(3,7);
       ctx.stroke();
+    },
+    "pen": function() {
+      cmd.pen(3,7);
     }
   },
   {
     "name": "Step 5",
     "color": "#0074D9",
-    "description": "Finally, we close a path. This uses the <code>ClosePath()</code> command that closes the path to most recently used <code>MoveTo(x,y)</code> command, which is our starting point.",
+    "description": "Finally, we close a path. This uses the <code>ClosePath()</code> command that closes the path to most recently used <code>MoveTo(x,y)</code> command, which is our starting point.<br><br>This DOES NOT move the <span class='poly black'>pen</span>.",
     "commandx": "ClosePath()",
     "buttonText": "Next step",
     "command": function() {
-      ctx.strokeStyle = '#0074D9';
+      ctx.strokeStyle = this.color;
       ctx.beginPath();
       cmd.mt(3,7);
       cmd.lt(1,2);
       ctx.stroke();
+    },
+    "pen": function() {
+      cmd.pen(3,7);
     }
   },
   {
@@ -167,11 +197,9 @@ var steps = [
     "description": "Now on to the <span class='poly red'>red polygon</span>. This requires another <code>MoveTo</code> command relative to the last <code>LineTo</code> of the previous polygon.",
     "commandx": "MoveTo(1,-5)",
     "buttonText": "Next step",
-    "command": function() {
-      ctx.fillStyle = '#FF4136';
-      ctx.beginPath();
-      cmd.arc(4,2);
-      ctx.fill();
+    "command": function() {},
+    "pen": function() {
+      cmd.pen(4,2);
     }
   },
   {
@@ -181,11 +209,14 @@ var steps = [
     "commandx": "LineTo(-1,2)",
     "buttonText": "Next step",
     "command": function() {
-      ctx.strokeStyle = '#FF4136';
+      ctx.strokeStyle = this.color;
       ctx.beginPath();
       cmd.mt(4,2);
       cmd.lt(3,4);
       ctx.stroke();
+    },
+    "pen": function() {
+      cmd.pen(3,4);
     }
   },
   {
@@ -195,11 +226,14 @@ var steps = [
     "commandx": "LineTo(2,1)",
     "buttonText": "Next step",
     "command": function() {
-      ctx.strokeStyle = '#FF4136';
+      ctx.strokeStyle = this.color;
       ctx.beginPath();
       cmd.mt(3,4);
       cmd.lt(5,5);
       ctx.stroke();
+    },
+    "pen": function() {
+      cmd.pen(5,5);
     }
   },
   {
@@ -209,19 +243,57 @@ var steps = [
     "commandx": "ClosePath()",
     "buttonText": "Next step",
     "command": function() {
-      ctx.strokeStyle = '#FF4136';
+      ctx.strokeStyle = this.color;
       ctx.beginPath();
       cmd.mt(5,5);
       cmd.lt(4,2);
       ctx.stroke();
+    },
+    "pen": function() {
+      cmd.pen(5,5);
     }
   },
   {
     "name": "Fin.",
     "color": "#FF4136",
-    "description": "Encoding a single vector tile into <code>.mvt</code> format happens quickly with tools like Mapnik or Node Mapnik. It's important to keep in mind that geometry coordinates are translated into non-geographic vector grid coordiantes, which results in some simplification. In order to reduce the visual impact, vector tiles are rendered to a maximum zoom level. Once you hit that zoom level, another tile is loaded with more detail.",
+    "description": "Encoding is complete! Now if we render the vector tile, you'll notice the <span class='poly blue'>blue polygon</span> has a hole (interior ring) represented by the <span class='poly red'>red polygon</span>'s opposite winding order.<br><br>Encoding a single vector tile into <code>.mvt</code> format happens quickly with tools like Mapnik or Node Mapnik. It's important to keep in mind that geometry coordinates are translated into non-geographic vector grid coordinates, which results in some simplification. In order to reduce the visual impact, vector tiles are rendered to a maximum zoom level. Once you hit that zoom level, another tile is loaded with more detail.",
     "commandx": "",
     "buttonText": "Start over",
-    "command": function() {}
+    "command": function() {
+      grid.style.opacity = 0;
+      // clear canvas
+      setTimeout(function() {
+        ctxClear();
+
+        // draw border
+        ctx.fillRect(padding, padding, ctx.canvas.width, ctx.canvas.height);
+
+        // draw blue square
+        ctx.fillStyle = '#0074D9';
+        ctx.beginPath();
+        cmd.mt(1,2);
+        cmd.lt(4,1);
+        cmd.lt(7,5);
+        cmd.lt(3,7);
+        ctx.closePath();
+        ctx.fill();
+
+        // draw blue square
+        ctx.fillStyle = '#e5e5e5';
+        ctx.beginPath();
+        cmd.mt(4,2);
+        cmd.lt(3,4);
+        cmd.lt(5,5);
+        ctx.closePath();
+        ctx.fill();
+
+        // set opacity back on canvas
+        grid.style.opacity = 1;
+      }, 1200);
+      // draw border OR transparent grid
+      // draw blue square, fill blue
+      // draw red square, fill white
+    },
+    "pen": function() {}
   },
 ];

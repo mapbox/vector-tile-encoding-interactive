@@ -6,7 +6,9 @@ body {
   float: left;
   margin-right: 1em;
 }
-canvas {}
+canvas {
+  transition: 1s;
+}
 
 #example {
   height: 300px;
@@ -43,6 +45,9 @@ canvas {}
 }
 .red { 
   background-color: #FF4136;
+}
+.black { 
+  background-color: #333333;
 }
 #vt-next {
   float: right;
